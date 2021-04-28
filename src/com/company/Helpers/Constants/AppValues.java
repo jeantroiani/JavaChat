@@ -2,6 +2,8 @@ package com.company.Helpers.Constants;
 
 public class AppValues {
     static public Integer DEFAULT_SERVER_PORT = 14001;
+    static public Integer MAX_PORT = 49151;
+    static public Integer MIN_PORT = 1024;
     static public String DEFAULT_IP_ADDRESS = "127.0.0.1";
     static public String CLIENT_PORT_NUMBER_FLAG = "-ccp";
     static public String SERVER_PORT_NUMBER_FLAG = "-csp";

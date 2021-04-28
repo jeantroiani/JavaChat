@@ -4,15 +4,17 @@ import com.company.Helpers.Exceptions.InvalidArgumentException;
 
 import java.util.Objects;
 
+import static com.company.Helpers.Constants.AppValues.MAX_PORT;
+import static com.company.Helpers.Constants.AppValues.MIN_PORT;
 import static com.company.Helpers.Constants.Messages.Messages.VALID_PORT_NUMBERS;
 
 public class ChatServerValidation {
-    public static void isValidPort (Integer portNumber) throws InvalidArgumentException {
+    public static void isValidPort(Integer portNumber) throws InvalidArgumentException {
         if (Objects.isNull(portNumber)) {
             throw new InvalidArgumentException("Port cannot be null");
         }
 
-        if (portNumber < 1024 || portNumber > 49151) {
+        if (portNumber < MIN_PORT || portNumber > MAX_PORT) {
             throw new InvalidArgumentException(VALID_PORT_NUMBERS);
         }
     }

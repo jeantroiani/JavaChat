@@ -2,7 +2,6 @@ package com.company;
 
 
 import com.company.Client.Bot;
-import com.company.Client.Client;
 import com.company.Helpers.Arguments.Arguments;
 import com.company.Helpers.Exceptions.InvalidArgumentException;
 

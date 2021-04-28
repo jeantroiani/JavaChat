@@ -1,9 +1,9 @@
 package com.company;
 
 
+import com.company.Client.Client;
 import com.company.Helpers.Arguments.Arguments;
 import com.company.Helpers.Exceptions.InvalidArgumentException;
-import com.company.Client.Client;
 
 import java.util.*;
 

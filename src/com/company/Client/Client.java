@@ -1,13 +1,16 @@
 package com.company.Client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Objects;
 
-import static com.company.Helpers.Constants.AppValues.*;
-import static com.company.Helpers.Format.*;
+import static com.company.Helpers.Constants.AppValues.LOGOUT_KEYWORD;
 import static com.company.Helpers.Constants.Messages.Messages.*;
+import static com.company.Helpers.Format.*;
 
 public class Client {
     private final String address;
@@ -22,19 +25,24 @@ public class Client {
         start();
     }
 
-    private void start () {
+    private void submitName(Socket socket, PrintWriter writeTo) {
+        if (Objects.isNull(name)) {
+            setName(socket.getLocalSocketAddress().toString());
+        }
+        writeTo.println(name);
+    }
 
-        try  {
+    private void start() {
+
+        try {
             Socket socket = new Socket(address, port);
             logInformation(CONNECTION_SUCCESSFUL);
             BufferedReader commandLineReader = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter writeTo = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader readFrom = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             setUserLogged(true);
-            if (Objects.isNull(name)) {
-                setName(socket.getLocalSocketAddress().toString());
-            }
-            writeTo.println(name);
+
+            submitName(socket, writeTo);
 
             Thread send = new Thread(() -> {
                 while (isUserLogged()) {
@@ -56,8 +64,8 @@ public class Client {
             });
 
             Thread receive = new Thread(() -> {
-                        while (isUserLogged()) {
-                            try {
+                while (isUserLogged()) {
+                    try {
                         String message = readFrom.readLine();
                         if (message == null) {
                             setUserLogged(false);
@@ -75,7 +83,7 @@ public class Client {
 
             send.start();
             receive.start();
-        } catch(ConnectException connectException) {
+        } catch (ConnectException connectException) {
             logError(SERVER_NOT_RUNNING_ON_ADDRESS);
         } catch (IOException ioException) {
             System.out.println(ioException);

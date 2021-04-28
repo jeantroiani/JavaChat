@@ -6,13 +6,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static com.company.Helpers.Constants.AppValues.LOGOUT_KEYWORD;
 import static com.company.Helpers.Constants.Messages.Messages.*;
-import static com.company.Helpers.Format.logError;
-import static com.company.Helpers.Format.logInformation;
+import static com.company.Helpers.Format.*;
 
 public class ServerThread extends Thread {
     private String clientId;
@@ -29,25 +27,11 @@ public class ServerThread extends Thread {
         setClientLogged(true);
     }
 
-    private Boolean isPrivateMessage (String string) {
+    private Boolean isPrivateMessage(String string) {
         return string.charAt(0) == '*';
     }
 
-    private ArrayList<String> getRecipientAndMessage (String string) {
-        int idx = 2;
-        while (idx < string.length()) {
-            if (Character.isWhitespace(string.charAt(idx))) {
-                break;
-            }
-            idx++;
-        }
-        String recipientName = string.substring(1, idx);
-        String message = string.substring(idx + 1);
-
-        return new ArrayList<>(Arrays.asList(recipientName, message));
-    }
-
-    private void sendPrivateMessage (String message) {
+    private void sendPrivateMessage(String message) {
         ArrayList<String> recipientAndMessage = getRecipientAndMessage(message);
         ServerThread recipientId = Server.clientsConnected.get(recipientAndMessage.get(0));
         if (Objects.nonNull(recipientId)) {
@@ -57,7 +41,7 @@ public class ServerThread extends Thread {
         }
     }
 
-    private void sendPublicMessage (String message) {
+    private void sendPublicMessage(String message) {
         Server.clientsConnected.forEach((clientConnected, serverThread) -> {
             if (!clientConnected.equals(clientId)) {
                 serverThread.sendTo.println(clientId + ": " + message);
@@ -65,7 +49,7 @@ public class ServerThread extends Thread {
         });
     }
 
-    private void broadcastMessage (String message) {
+    private void broadcastMessage(String message) {
         if (Server.clientsConnected.isEmpty() || message.isEmpty()) return;
         if (isPrivateMessage(message)) {
             sendPrivateMessage(message);
@@ -74,11 +58,11 @@ public class ServerThread extends Thread {
         }
     }
 
-    private void removeClientFromList () throws IOException {
+    private void removeClientFromList() {
         Server.clientsConnected.remove(clientId, this);
     }
 
-    public void logOff () {
+    public void logOff() {
         try {
             setClientLogged(false);
             socket.close();
@@ -88,7 +72,7 @@ public class ServerThread extends Thread {
     }
 
     @Override
-    public void run ()  {
+    public void run() {
         try {
             String inputLine = readFrom.readLine();
             clientLogged = true;
@@ -96,7 +80,7 @@ public class ServerThread extends Thread {
                 if (inputLine == null) continue;
                 if (inputLine.equalsIgnoreCase(LOGOUT_KEYWORD)) {
                     logOff();
-                    logInformation(SOCKET_CLOSED + " Client ID: "  + clientId);
+                    logInformation(SOCKET_CLOSED + " Client ID: " + clientId);
                     removeClientFromList();
                     break;
                 }
@@ -104,7 +88,8 @@ public class ServerThread extends Thread {
                 inputLine = readFrom.readLine();
             }
         } catch (SocketException socketException) {
-            logInformation(SOCKET_CLOSED + " Client ID: "  + clientId);
+            removeClientFromList();
+            logInformation(SOCKET_CLOSED + " Client ID: " + clientId);
         } catch (IOException ioException) {
             logError(SOCKET_CONNECTION_FAILED);
         }
